@@ -1,6 +1,8 @@
+import 'package:appbook/module/detail/detail_page.dart';
 import 'package:appbook/module/home/home_page.dart';
 import 'package:appbook/module/signin/signin_page.dart';
 import 'package:appbook/module/signup/signup_page.dart';
+import 'package:appbook/shared/constants.dart';
 import 'package:appbook/shared/widget/app_color.dart';
 import 'package:flutter/material.dart';
 
@@ -17,7 +19,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
      debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: AppColor.yellow,
+        primarySwatch: AppColor.green,
+        textTheme: Theme.of(context).textTheme.apply(bodyColor: kTextColor),
       ),
       initialRoute: '/',
       routes: <String, WidgetBuilder>{
@@ -25,6 +28,7 @@ class MyApp extends StatelessWidget {
         '/sign-in':(context) => SignInPage(),
         '/sign-up':(context) => SignUpPage(),
         '/home':(context) => Home(),
+        '/detail':(context) => DetailPage(),
       },
     );
   }

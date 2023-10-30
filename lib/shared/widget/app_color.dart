@@ -18,5 +18,6 @@ class AppColor {
 
   static MaterialColor yellow = MaterialColor(0xffffde03, color);
   static MaterialColor blue = MaterialColor(0xff0336ff, color);
+  static MaterialColor green = MaterialColor(0xFF0C9869, color);
   static Color white = Color(0xFFFDFCFF);
 }

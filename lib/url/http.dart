@@ -1,3 +1,3 @@
 class URL {
-  static const url_api = 'https://34a3-14-233-190-43.ngrok.io';
+  static const url_api = 'http://8b4c-2001-ee0-4b48-49f0-759e-722b-797f-89c5.ngrok.io';
 }
