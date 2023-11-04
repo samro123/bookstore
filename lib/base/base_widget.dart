@@ -7,12 +7,15 @@ class PageContainer extends StatelessWidget {
   final Widget child;
   final List<SingleChildWidget> bloc;
   final List<SingleChildWidget> di;
+  final List<Widget> actions;
 
   const PageContainer({
     required this.title,
     required this.di,
     required this.bloc,
-    required this.child});
+    required this.child,
+    required this.actions
+  });
 
 
   @override
@@ -25,6 +28,8 @@ class PageContainer extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           title: Text(title,style: TextStyle(color: Colors.white),),
+          actions: actions,
+          elevation: 0,
         ),
         body: child,
       ),

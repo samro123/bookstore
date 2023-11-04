@@ -9,6 +9,6 @@ class ShoppingCart{
 
   factory ShoppingCart.fromJson(Map<String, dynamic> json) => ShoppingCart(
       orderId: json['orderId'] ?? '',
-      total: json['json'] ?? 0
+      total: json['total'] ?? 0
   );
 }

@@ -46,7 +46,7 @@ class HomeBloc extends BaseBloc with ChangeNotifier{
   void dispatchEvnet(BaseEvent event) {
     switch (event.runtimeType){
       case AddToCartEvent:
-
+        handleAddToCart(event);
     }
   }
 

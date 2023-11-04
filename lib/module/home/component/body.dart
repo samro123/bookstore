@@ -1,3 +1,4 @@
+import 'package:appbook/event/add_to_cart_event.dart';
 import 'package:appbook/module/home/component/header_with_search_box.dart';
 import 'package:appbook/module/home/component/tile_with_under_line.dart';
 import 'package:appbook/module/home/component/title_with_more_btn.dart';
@@ -30,29 +31,7 @@ class Body extends StatelessWidget {
               catchError: (context, error) {
                 return error;
               },
-            child: Consumer<Object?>(
-              builder: (context, data, child) {
-                if (data == null){
-                  return Center(
-                    child: CircularProgressIndicator(
-                      backgroundColor: Colors.yellow,
-                    ),
-                  );
-                }
-
-                if (data is RestError){
-                  return Center(
-                    child: Container(
-                      child: Text(
-                        data.message,
-                        style: TextStyle(fontSize: 20),
-                      ),
-                    ),
-                  );
-                }
-
-                var products = data as List<Product>;
-                return Container(
+            child: Container(
                   child: SingleChildScrollView(
                     scrollDirection: Axis.vertical,
                     child: Column(
@@ -70,33 +49,62 @@ class Body extends StatelessWidget {
 
                         ),
                         //it will cover 40% of our total width
-                        Container(
+
+                    Consumer<Object?>(
+                      builder: (context, data, child) {
+                        if (data == null) {
+                          return Center(
+                            child: CircularProgressIndicator(
+                              backgroundColor: Colors.yellow,
+                            ),
+                          );
+                        }
+
+                        if (data is RestError) {
+                          return Center(
+                            child: Container(
+                              child: Text(
+                                data.message,
+                                style: TextStyle(fontSize: 20),
+                              ),
+                            ),
+                          );
+                        }
+                        var products = data as List<Product>;
+                        return Container(
                           height: size.height * 0.6,
                           child: ListView.builder(
                             scrollDirection: Axis.horizontal,
                             itemCount: products.length,
                             itemBuilder:(context, index) {
                               return RecomendCard(
-                                  image: products[index].productImage,
-                                  title: products[index].productName,
-                                  country: products[index].productId,
-                                  price: products[index].price,
-                                  press: (){
-                                    Navigator.pushNamed(context, '/detail');
-                                  },
-                                  pressBuy: (){
-
-                                  },
+                                image: products[index].productImage,
+                                title: products[index].productName,
+                                country: products[index].productId,
+                                price: products[index].price,
+                                id: products[index].productId,
+                                press: (){
+                                  Navigator.of(context).pushNamed(
+                                      '/detail',
+                                       arguments: {
+                                        'product' : products[index],
+                                         'bloc': bloc
+                                       }
+                                  );
+                                },
+                                pressBuy: (){
+                                  bloc.event.add(AddToCartEvent(product: products[index]));
+                                  print("Buy");
+                                },
                               );
                             },),
-                        )
+                        );
+                      }
+                      )
                       ],
                     ),
                   ),
-                );
-              },
-
-            ),
+                ),
           ),
         )
         ,
@@ -106,7 +114,7 @@ class Body extends StatelessWidget {
 }
 
 class RecomendCard extends StatelessWidget {
-  final String image, title, country;
+  final String image, title, country, id;
   final double price;
   final Function() press;
   final Function() pressBuy;
@@ -116,6 +124,7 @@ class RecomendCard extends StatelessWidget {
     required this.title,
     required this.country,
     required this.price,
+    required this.id,
     required this.press,
     required this.pressBuy
   });
@@ -137,7 +146,13 @@ class RecomendCard extends StatelessWidget {
         children: [
           Stack(
             children: [
-              Image.network(image),
+              Hero(
+                  tag: id,
+                  child: GestureDetector(
+                     onTap: press,
+                      child: Image.network(image)
+                  )
+              ),
               Positioned(
                 right: -20,
                 top: -10,
@@ -157,55 +172,52 @@ class RecomendCard extends StatelessWidget {
             ],
             clipBehavior: Clip.none,
           ),
-          GestureDetector(
-            onTap: press,
-            child: Container(
-              padding: EdgeInsets.all(kDefaultPadding / 2),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(10),
-                  bottomRight: Radius.circular(10)
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    offset: Offset(0,10),
-                    blurRadius: 50,
-                    color: kPrimaryColor.withOpacity(0.23)
-                  )
-                ]
+          Container(
+            padding: EdgeInsets.all(kDefaultPadding / 2),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(10),
+                bottomRight: Radius.circular(10)
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                             Text("$title".toUpperCase(),
-                               // style: Theme.of(context).textTheme.button,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
+              boxShadow: [
+                BoxShadow(
+                  offset: Offset(0,10),
+                  blurRadius: 50,
+                  color: kPrimaryColor.withOpacity(0.23)
+                )
+              ]
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                           Text("$title".toUpperCase(),
+                             // style: Theme.of(context).textTheme.button,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+
+                        Text("$country",
+                            style: TextStyle(
+                                color: kPrimaryColor.withOpacity(0.5),
+
                             ),
+                        maxLines: 1,)
+                      ],
+                    ),
 
-                          Text("$country",
-                              style: TextStyle(
-                                  color: kPrimaryColor.withOpacity(0.5),
-
-                              ),
-                          maxLines: 1,)
-                        ],
-                      ),
-
-                  ),
-                  Text("\$$price",
-                    style: Theme.of(context)
-                        .textTheme.button!
-                        .copyWith(color: kPrimaryColor),)
-                ],
-              ),
+                ),
+                Text("\$$price",
+                  style: Theme.of(context)
+                      .textTheme.button!
+                      .copyWith(color: kPrimaryColor),)
+              ],
             ),
           )
         ],

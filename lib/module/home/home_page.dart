@@ -8,6 +8,7 @@ import 'package:appbook/module/home/home_bloc.dart';
 import 'package:appbook/shared/model/order_data.dart';
 import 'package:appbook/shared/model/product_data.dart';
 import 'package:appbook/shared/model/rest_error.dart';
+import 'package:appbook/shared/model/shopping_cart_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:badges/badges.dart' as badges;
@@ -19,7 +20,7 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PageContainer(
-        title: 'Home',
+        title: '',
         di: [
           Provider.value(value: ProductService()),
           Provider.value(value: OrderService()),
@@ -34,6 +35,9 @@ class Home extends StatelessWidget {
           )
         ],
         bloc: [],
+        actions: [
+          ShoppingCartWidget(),
+        ],
         child: Body()
     );
   }
@@ -51,14 +55,74 @@ class ShoppingCartWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: badges.Badge(
-        badgeContent: Text('1'),
-        child: Icon(Icons.shopping_cart),
-      )
+    return ChangeNotifierProvider.value(
+      value: HomeBloc.getInstance(
+          productRepo: Provider.of(context),
+          orderRepo: Provider.of(context)
+      ),
+      child: CartWidget(),
     );
   }
 }
+
+class CartWidget extends StatefulWidget {
+  const CartWidget({Key? key}) : super(key: key);
+
+  @override
+  State<CartWidget> createState() => _CartWidgetState();
+}
+
+class _CartWidgetState extends State<CartWidget> {
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+    var bloc = Provider.of<HomeBloc>(context);
+    bloc.getShoppingCartInfo();
+  }
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<HomeBloc>(
+          builder: (context, bloc, child) => StreamProvider<Object?>.value(
+            value: bloc.shoppingCartStream,
+            initialData: null,
+            catchError: (context, error){
+              return error;
+            },
+            child: Consumer<Object?>(
+              builder: (context, data, child) {
+                if(data == null || data is RestError){
+                  return Container(
+                    margin: EdgeInsets.only(top: 15, right: 20),
+                    child: Icon(Icons.shopping_cart),
+                  );
+                }
+
+                var cart = data as ShoppingCart;
+                return Container(
+                  margin: EdgeInsets.only(top: 15, right: 20),
+                  child: badges.Badge(
+                    badgeContent: Text(
+                      '${cart.total}',
+                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    ),
+                    child: Icon(Icons.shopping_cart),
+                  ),
+                );
+              },
+            ),
+          ),
+    );
+  }
+}
+
 
 class ProductListWidget extends StatelessWidget {
   @override

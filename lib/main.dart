@@ -1,9 +1,11 @@
+import 'package:appbook/module/cart/cart_screen.dart';
 import 'package:appbook/module/detail/detail_page.dart';
 import 'package:appbook/module/home/home_page.dart';
 import 'package:appbook/module/signin/signin_page.dart';
 import 'package:appbook/module/signup/signup_page.dart';
 import 'package:appbook/shared/constants.dart';
 import 'package:appbook/shared/widget/app_color.dart';
+import 'package:appbook/shared/widget/menubottom.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -29,6 +31,8 @@ class MyApp extends StatelessWidget {
         '/sign-up':(context) => SignUpPage(),
         '/home':(context) => Home(),
         '/detail':(context) => DetailPage(),
+        '/:tab':(context) => MenuBottom(),
+        '/cart': (context) => CartPage(),
       },
     );
   }

@@ -27,6 +27,7 @@ class SignInPage extends StatelessWidget {
           )
         ],
         bloc: [],
+        actions: [],
         child: SignInFormWidget()
     );
   }
